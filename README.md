@@ -1,4 +1,4 @@
-# 6502 Template - Tang Nano 9K
+# 6502 Template - Tang Nano 9K (16KB ROM)
 
 🚀 **Proyecto base/template** para desarrollo en CPU 6502 sobre FPGA Tang Nano 9K.
 
@@ -7,8 +7,10 @@ Usa este proyecto como punto de partida para crear tus propias aplicaciones con 
 ## Características
 
 - ✅ CPU 6502 @ 3.375 MHz en FPGA Tang Nano 9K
+- ✅ **ROM de 16KB** ($8000-$BFFF)
 - ✅ Control de 6 LEDs 
 - ✅ Comunicación UART para debug
+- ✅ **Timer hardware** para delays precisos
 - ✅ Compilación con cc65
 - ✅ **Compatible con librerías estándar de cc65** (stdlib, string, etc.)
 - ✅ Startup con copydata y zerobss
@@ -21,6 +23,7 @@ Usa este proyecto como punto de partida para crear tus propias aplicaciones con 
 | PORT_SALIDA_LED | $C001 | Puerto de salida para 6 LEDs (bits 0-5) |
 | CONF_PORT_SALIDA_LED | $C003 | Configuración: 0=salida, 1=entrada |
 | UART | $C020-$C022 | Comunicación serial para debug |
+| Timer | $C030-$C03C | Timer hardware con contador de microsegundos |
 
 ## Estructura del Proyecto
 
@@ -29,8 +32,9 @@ Usa este proyecto como punto de partida para crear tus propias aplicaciones con 
 │   ├── main.c              # Programa principal (edita aquí)
 │   ├── startup.s           # Inicialización del sistema
 │   └── simple_vectors.s    # Vectores de interrupción 6502
-├── libs/                   # Librerías (UART, Timer, I2C, etc.)
-│   └── uart/
+├── libs/                   # Librerías
+│   ├── uart/               # Comunicación serial
+│   └── timer-6502-cc65/    # Timer hardware (delays precisos)
 ├── config/
 │   └── fpga.cfg            # Configuración del linker cc65
 ├── scripts/
@@ -67,7 +71,27 @@ make clean
 ### Cargar en FPGA
 Copiar `output/rom.vhd` al proyecto FPGA y sintetizar.
 
-## Uso de Librerías cc65
+## Uso de Librerías
+
+### Timer Hardware
+
+```c
+#include "timer.h"
+
+int main(void) {
+    timer_init();
+    
+    while (1) {
+        PORT_SALIDA_LED = 0x00;   // LED ON
+        delay_ms(500);            // 500ms exactos
+        
+        PORT_SALIDA_LED = 0xFF;   // LED OFF
+        delay_ms(500);
+    }
+}
+```
+
+### Librerías cc65
 
 Este template incluye un startup que inicializa correctamente el runtime de cc65.
 Puedes usar librerías estándar sin problemas:
@@ -94,12 +118,13 @@ int main(void) {
 | Región | Dirección | Tamaño | Descripción |
 |--------|-----------|--------|-------------|
 | Zero Page | $0002-$00FF | 254 bytes | Variables rápidas cc65 |
-| RAM | $0100-$3DFF | ~15 KB | RAM principal + DATA |
+| RAM | $0200-$3DFF | ~15 KB | RAM principal + DATA |
 | Stack | $3E00-$3FFF | 512 bytes | Pila del sistema |
-| ROM | $8000-$9FF9 | 8 KB | Código del programa |
-| Vectores | $9FFA-$9FFF | 6 bytes | NMI, RESET, IRQ |
+| **ROM** | **$8000-$BFF9** | **16 KB** | Código del programa |
+| Vectores | $BFFA-$BFFF | 6 bytes | NMI, RESET, IRQ |
 | I/O | $C000-$C003 | 4 bytes | Puertos de E/S |
 | UART | $C020-$C022 | 3 bytes | Comunicación serial |
+| Timer | $C030-$C03C | 13 bytes | Timer hardware |
 
 ## Archivos del Sistema
 
