@@ -46,11 +46,34 @@ Usa este proyecto como punto de partida para crear tus propias aplicaciones con 
 
 ## Cómo Usar este Template
 
-1. **Clona o descarga** este repositorio
-2. **Edita** `src/main.c` con tu código
-3. **Agrega librerías** en la carpeta `libs/` según necesites
+1. **Clona** este repositorio
+2. **Instala las librerías** (ver sección siguiente)
+3. **Edita** `src/main.c` con tu código
 4. **Compila** con `make`
 5. **Carga** `output/rom.vhd` en tu proyecto FPGA
+
+## Dependencias (Librerías)
+
+Este proyecto requiere las siguientes librerías que deben clonarse en la carpeta `libs/`:
+
+| Librería | Repositorio | Descripción |
+|----------|-------------|-------------|
+| **UART** | [uart-6502-cc65](https://github.com/nelsama/uart-6502-cc65) | Comunicación serial |
+| **Timer** | [timer-6502-cc65](https://github.com/nelsama/timer-6502-cc65) | Delays precisos y cronómetro |
+
+### Instalación de librerías
+
+```bash
+cd libs
+git clone https://github.com/nelsama/uart-6502-cc65.git uart
+git clone https://github.com/nelsama/timer-6502-cc65.git timer-6502-cc65
+```
+
+O usando submódulos git:
+```bash
+git submodule add https://github.com/nelsama/uart-6502-cc65.git libs/uart
+git submodule add https://github.com/nelsama/timer-6502-cc65.git libs/timer-6502-cc65
+```
 
 ## Compilación
 
